@@ -1,0 +1,55 @@
+# https://flake8.pycqa.org/en/latest/user/options.html#options-list
+
+[flake8]
+max-line-length = 120
+# application-import-names =
+#     app,
+#     tests
+select =
+    ANN,
+    B,
+    B9,
+    BLK,
+    C,
+    D,
+    DAR,
+    E,
+    F,
+    I,
+    S,
+    W
+# default error exclude patterns, modify only extend-ignore
+# ignore =
+#     E121,
+#     E123,
+#     E126,
+#     E226,
+#     E24,
+#     E704,
+#     W503,
+#     W504
+extend-ignore =
+    E203,
+    E501
+# default file include patterns, modify only by adding items to the list, i.e. avoid deleting them
+# filename:
+#     *.py
+# default file exclude patterns, modify only extend-exclude
+# exclude:
+#     .svn,
+#     CVS,
+#     .bzr,
+#     .hg,
+#     .git,
+#     __pycache__,
+#     .tox
+# extend-exclude:
+#     <pattern>
+max-complexity = 10
+import-order-style = google
+docstring-convention = google
+# number of subprocesses to run in parallel
+jobs = auto
+# pylint format also available, other formats available only if installed
+format = default
+statistics = True

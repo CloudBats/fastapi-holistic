@@ -1,0 +1,4 @@
+# this file is for configuring poetry itself, it has no effect on the app
+[virtualenvs]
+in-project = true
+create = false

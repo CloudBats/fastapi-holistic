@@ -1,0 +1,28 @@
+# https://black.readthedocs.io/en/stable/installation_and_usage.html
+# https://black.readthedocs.io/en/stable/pyproject_toml.html
+
+[tool.black]
+line-length = 120
+target-version = ['py38']
+# default include regex pattern, modify only by adding patterns to the list, i.e. avoid deleting them
+# include = '\.pyi?$'
+# exclude regex pattern, modify only by adding patterns to the list, i.e. avoid deleting them
+exclude = '''
+(
+    /(
+          \.eggs
+        | \.git
+        | \.hg
+        | \.mypy_cache
+        | \.nox
+        | \.tox
+        | \.venv
+        | \.svn
+        | _build
+        | buck-out
+        | build
+        | dist
+        | venv
+    )/
+)
+'''

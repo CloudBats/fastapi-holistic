@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "fastapi-holistic"
+version = "0.1.0"
+description = "A holistic approach to back end service development with FastAPI"
+authors = ["Teodor Dumitrescu"]
+license = "MIT"
+packages = [
+    { include = "app", from = "src" },
+    { include = "fastapi_laser", from = "src" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = {extras = ["all"], version = "^0.78.0"}
+SQLAlchemy = "^1.4.37"
+loguru = "^0.6.0"
+alembic = "^1.8.0"
+typer = "^0.4.1"
+gunicorn = "^20.1.0"
+
+[tool.poetry.dev-dependencies]
+black = "^22.3.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+# TODO: add db migration and probe script target modules
+app-db-probe = "app.database.probes:health_check"
+app-db-migrations = "app.database.migrations.cli:cli"

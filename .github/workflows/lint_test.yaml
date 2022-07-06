@@ -1,0 +1,90 @@
+---
+name: Lint and Test
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      venv_dir: .venv
+      PIP_DISABLE_PIP_VERSION_CHECK: 1
+      # this actually means cache is disabled, weird design choice
+      PIP_NO_CACHE_DIR: 0
+    services:
+      # Label used to access the service container
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: local
+        ports: ["5432:5432"]
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+    - name: Checkout repo branch
+      uses: actions/checkout@v2
+
+    - name: Install Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.9
+
+    - name: Add exectuable paths to system PATH for the next steps
+      # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#adding-a-system-path
+      run: |
+        echo "${HOME}/.poetry/bin" >> ${GITHUB_PATH}
+
+    - name: Install build system tools
+      # https://python-poetry.org/docs/#installation
+      run: |
+        set -euxo pipefail
+        env | sort
+        python -VV
+        python -m pip install --upgrade -r requirements-build.txt -r requirements-management.txt
+        pip -V
+        invoke -V
+        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - --no-modify-path
+        # ln -s ${HOME}/.poetry/bin/poetry /usr/local/bin
+        poetry -V
+        invoke ci.poetry-config-venv-no-create
+
+    - name: Create requirements.txt for use by cache
+      run: |
+        invoke ci.requirements-dev
+
+    - name: Cache virtual environment
+      # for more complex cache options see the docs
+      # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+      uses: actions/cache@v2
+      id: cache-venv
+      with:
+        path: ./${{ env.venv_dir }}/
+        # cache key based on requirements.txt
+        key: ${{ runner.os }}-venv-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements*.txt') }}
+
+    - name: Create virtual environment with dependencies if not present
+      if: steps.cache-venv.outputs.cache-hit != 'true'
+      run: |
+        set -euxo pipefail
+        # poetry install --no-root
+        python -m venv ./${{ env.venv_dir }}
+        ./${{ env.venv_dir }}/bin/python -m pip install -r requirements-build.txt
+        ./${{ env.venv_dir }}/bin/pip install -r requirements.txt
+
+
+    # Activate venv in every step, the shell environment is always fresh
+    - name: Install app and run lint and test
+      run: |
+        set -euxo pipefail
+        # poetry config --local virtualenvs.in-project true
+        # poetry install
+        # invoke prod.install
+        # poetry run pytest .
+        invoke prod.build && ./${{ env.venv_dir }}/bin/pip install --force-reinstall --no-dependencies dist/*.whl && rm -rf dist
+        . ./${{ env.venv_dir }}/bin/activate && invoke ci.test
