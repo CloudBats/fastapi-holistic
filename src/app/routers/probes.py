@@ -1,11 +1,10 @@
-from fastapi import Depends, status
+from fastapi import status
 
 from fastapi_laser import fastapi_ext
 
-from app import app_config, deps
 
-
-router = fastapi_ext.get_router(dependencies=[Depends(deps.verify_sa_identity([app_config.scheduler_sa_email]))])
+# Add dependencies here to apply them to the entire API
+router = fastapi_ext.get_router(dependencies=[])
 
 
 @router.get("/liveness", status_code=status.HTTP_200_OK)

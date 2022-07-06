@@ -2,6 +2,8 @@ from invoke import task
 
 import os
 
+from . import packaging
+
 
 @task
 def pre_start(c):
@@ -9,6 +11,7 @@ def pre_start(c):
 
     DO NOT use to install os or python packages."""
 
+    # TODO: enable after making it work in docker
     # c.run("app-db-probe")
 
 
@@ -26,18 +29,18 @@ def start_gunicorn(c):
 
     env = dict(HOST=HOST, PORT=PORT)
     # TODO: see is --preload is desirable https://docs.gunicorn.org/en/stable/settings.html#preload-app
-    c.run(f'exec .venv/bin/gunicorn --config "{GUNICORN_CONF}" "{APP_MODULE}"', env=env)
+    c.run(f'{packaging.VENV_DIR}/bin/gunicorn --config "{GUNICORN_CONF}" "{APP_MODULE}"', env=env)
 
 
 @task(pre_start)
 def start_gunicorn_dev(c):
     """Start Gunicorn with Uvicorn workers, with debug and live reload."""
     env = dict(HOST=HOST, PORT=PORT, LOG_LEVEL="debug", GUNICORN_MAX_WORKERS="2")
-    c.run(f'exec .venv/bin/gunicorn --config "{GUNICORN_CONF}" --reload "{APP_MODULE}"', env=env)
+    c.run(f'{packaging.VENV_DIR}/bin/gunicorn --config "{GUNICORN_CONF}" --reload "{APP_MODULE}"', env=env)
 
 
 @task(pre_start)
 def start_uvicorn_dev(c):
     """Start Uvicorn with live reload."""
     env = dict(UVICORN_HOST=HOST, UVICORN_PORT=PORT, UVICORN_LOG_LEVEL="debug")
-    c.run(f'exec .venv/bin/uvicorn --reload "{APP_MODULE}"', env=env)
+    c.run(f'{packaging.VENV_DIR}/bin/uvicorn --reload "{APP_MODULE}"', env=env)

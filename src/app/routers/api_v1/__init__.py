@@ -1,6 +1,7 @@
 from app import module_based_router_factory
 
-from . import balances, conversions, payments, rates, reference
+# import modules in the current directory and use them directly in the router
+from . import items
 
 
-router = module_based_router_factory(balances, conversions, payments, rates, reference)
+router = module_based_router_factory(items)

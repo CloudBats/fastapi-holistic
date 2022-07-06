@@ -3,11 +3,12 @@ import sqlalchemy.orm
 
 from fastapi_laser import fastapi_ext
 
-from app import app_config, deps
+from app import deps
 from app.database.migrations.cli import migration
 
 
-router = fastapi_ext.get_router(dependencies=[Depends(deps.verify_sa_identity([app_config.functions_sa_email]))])
+# Add dependencies here to apply them to the entire API
+router = fastapi_ext.get_router(dependencies=[])
 
 
 @router.get("/upgrade/head")

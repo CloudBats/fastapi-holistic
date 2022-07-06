@@ -23,10 +23,16 @@ def format_docker_env_options(variables: Optional[dict] = None, file_name: Optio
     return env_options + env_file_option
 
 
+DOCKER_VOLUME_MOUNTS = (
+    f" --mount type=bind,src={utils.cwd}/src,dst=/home/{APP_USER}/app/src"
+    f" --mount type=bind,src={utils.cwd}/config,dst=/home/{APP_USER}/app/config"
+    f" --mount type=bind,src={utils.cwd}/tests,dst=/home/{APP_USER}/app/tests"
+)
 DOCKER_DEV_RUN_COMMAND = (
     "docker run -d"
     f"{format_docker_env_options(file_name=utils.DOT_ENV_FILE_NAME)}"
     " --network host"
+    f"{DOCKER_VOLUME_MOUNTS}"
     f" --name {APP_CONTAINER_NAME_DEV}"
     f" {APP_IMAGE_NAME_DEV}"
     " /usr/bin/tail -f /dev/null"
@@ -77,12 +83,9 @@ def start_db_docker(c):
     }
     c.run(
         "docker run -d"
-        # "docker run -it"
-        # TODO: see how --network host impacts --publish
-        " --network host"
+        f" --publish {run.HOST}:{DB_PORT}:{DB_PORT}"
         f"{format_docker_env_options(db_vars)}"
         # f" --mount type=bind,src={cwd}/config,dst=/app/config"
-        f" --publish {run.HOST}:{DB_PORT}:{DB_PORT}"
         f" --name {DB_CONTAINER_NAME}"
         f" {DB_IMAGE_NAME}"
     )
@@ -194,9 +197,7 @@ def start_dev_docker(c):
             "docker run -it"
             f" --publish {run.HOST}:{run.PORT}:{run.PORT}"
             f"{format_docker_env_options(file_name=utils.DOT_ENV_FILE_NAME)}"
-            f" --mount type=bind,src={utils.cwd}/src,dst=/home/{APP_USER}/app/src"
-            f" --mount type=bind,src={utils.cwd}/config,dst=/home/{APP_USER}/app/config"
-            f" --mount type=bind,src={utils.cwd}/tests,dst=/home/{APP_USER}/app/tests"
+            f"{DOCKER_VOLUME_MOUNTS}"
             f" --name {APP_CONTAINER_NAME_DEV}"
             f" {APP_IMAGE_NAME_DEV}"
         )

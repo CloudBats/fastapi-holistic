@@ -9,7 +9,6 @@ import sqlalchemy.orm
 import vcr
 
 import app.app
-import app.auth
 import app.database.session
 import app.deps
 import app.models.base_model

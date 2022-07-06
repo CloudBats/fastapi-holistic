@@ -118,13 +118,11 @@ COPY .env-local-defaults ./
 ENV PORT=8080
 EXPOSE ${PORT}
 
-RUN ls /home/${APP_USER}/.local/bin
-
 
 # We expect src/, config/ and tests/ to be volume mounts
 FROM app-dev-base AS app-dev
 
-CMD ["invoke", "dev.start"]
+CMD ["invoke", "dev.start-gunicorn"]
 
 
 FROM app-dev-base AS app-ci

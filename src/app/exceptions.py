@@ -30,3 +30,11 @@ class ContentsMismatchIdempotencyError(BasePackageError):
     expected: dict = None
     received: dict = None
     status_code: int = status.HTTP_409_CONFLICT
+
+
+@dataclass
+class TestRaiseCustomError(BasePackageError):
+    """Guilty custom error."""
+
+    i_knew_it_was_wrong: bool = False
+    i_did_it_anyway: bool = False

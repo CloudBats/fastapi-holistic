@@ -5,8 +5,6 @@ import sqlalchemy.orm
 
 import app.database.session
 
-from . import app_config
-
 
 def db_session() -> Generator[sqlalchemy.orm.Session, None, None]:
     session_ = None

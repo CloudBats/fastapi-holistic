@@ -3,10 +3,10 @@ from loguru import logger
 
 from app import module_based_router_factory
 
-from . import auth, cycl, database, error
+from . import database, error
 
 
-router = module_based_router_factory(cycl, database, error, auth)
+router = module_based_router_factory(database, error)
 
 
 @router.get("/", status_code=status.HTTP_200_OK)

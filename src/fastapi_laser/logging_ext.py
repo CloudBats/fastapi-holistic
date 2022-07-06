@@ -6,7 +6,7 @@ import sys
 from loguru import logger
 from loguru._logger import Logger
 
-from . import exception_ext, gcp
+from . import exception_ext
 
 
 DEFAULT_CUSTOM_THIRD_PARTY_LEVEL = logging.WARNING
@@ -174,6 +174,8 @@ def init_loguru(
         return
 
     if use_google_cloud_logging:
+        from . import gcp
+
         logger.add(sink=gcp.get_cloud_logging_handler(), **shared)
         # TODO: see why it's not getting triggered, probably logger variable scope not module
         # logger.patch(add_google_cloud_items)

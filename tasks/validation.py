@@ -12,7 +12,8 @@ TESTS_PATH = "tests"
 
 @task
 def pylint(c):
-    c.run(f"pylint {SOURCES_PATH} --rcfile {TOOLS_CONFIG_PATH}/pylintrc")
+    c.run(f"echo pylint currently disabled")
+    # c.run(f"pylint {SOURCES_PATH} --rcfile {TOOLS_CONFIG_PATH}/pylintrc")
 
 
 @task
@@ -90,7 +91,7 @@ def pytest_with_docker_db(c):
 
     with containers.db_docker(c):
         # TODO: replace with task
-        c.run(". ./scripts/prestart.sh")
+        # c.run(". ./scripts/prestart.sh")
         pytest(c)
 
 
@@ -122,5 +123,5 @@ def test_dev_with_db_docker(c):
         c.run(containers.DOCKER_LINT_COMMAND)
         with containers.db_docker(c):
             # TODO: replace with task
-            c.run(". ./scripts/prestart.sh")
+            # c.run(". ./scripts/prestart.sh")
             c.run(containers.DOCKER_TEST_COMMAND)
