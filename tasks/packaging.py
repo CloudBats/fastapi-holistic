@@ -7,7 +7,8 @@ from invoke import task
 PIP_ARGS = "--disable-pip-version-check --no-cache-dir"
 PIP_COMMAND = f"pip {PIP_ARGS}"
 VENV_DIR = os.getenv("VENV_DIR", ".venv")
-# Do NOT use /usr/bin/python3, the official Python Docker image doesn't touch the system python found there
+# Do NOT use /usr/bin/python3 for the official Python docker image, it doesn't touch the system python found there
+# TODO: this only works in the official Python docker image, use /usr/bin/python3 if /usr/local/bin/python3 is missing
 SYSTEM_PYTHON_PATH = "/usr/local/bin/python3"
 cwd = Path.cwd()
 
@@ -155,8 +156,7 @@ def poetry_config_venv_no_create(c):
 
 @task(poetry_config_venv_create_in_project, poetry_config_venv_no_create)
 def poetry_configure(c):
-    c.run("poetry config virtualenvs.create false")
-    c.run("poetry config virtualenvs.in-project true")
+    pass
 
 
 POETRY_VERSION = "1.1.13"
@@ -205,7 +205,9 @@ PYENV_VENV_NAME = f"{PROJECT_NAME}-{PYTHON_VERSION.replace('.', '')}"
 @task
 def pyenv_check(c):
     c.run(
-        'if ! pyenv --version ; then echo "Missing pyenv, see: https://github.com/pyenv/pyenv#installation" && exit 1; fi'
+        'if ! pyenv --version ;'
+        ' then echo "Missing pyenv, see: https://github.com/pyenv/pyenv#installation" && exit 1;'
+        ' fi'
     )
 
 

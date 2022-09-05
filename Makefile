@@ -1,6 +1,7 @@
 SHELL := /bin/bash
 
 PIP_ARGS := --disable-pip-version-check --no-cache-dir
+# TODO: this only works in the official Python docker image, use /usr/bin/python3 if /usr/local/bin/python3 is missing
 SYSTEM_PYTHON_PATH := /usr/local/bin/python3
 SYSTEM_PIP_INSTALL_COMMAND := $(SYSTEM_PYTHON_PATH) -m pip install $(PIP_ARGS)
 

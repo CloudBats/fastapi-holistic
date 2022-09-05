@@ -97,7 +97,7 @@ def start_db_docker(c):
 
 
 # TODO: see how to replace this with @task parameters
-def stop_docker_container(c, container_name: str):
+def stop_rm_docker_container(c, container_name: str):
     c.run(f"echo Attempting to stop and remove {container_name} docker container...", echo=False)
     result = c.run(f"docker container ls -a -q --filter name={container_name}").stdout.strip()
     if result:
@@ -108,18 +108,18 @@ def stop_docker_container(c, container_name: str):
 
 
 @task
-def stop_db_docker(c):
-    stop_docker_container(c, DB_CONTAINER_NAME)
+def stop_rm_db_docker(c):
+    stop_rm_docker_container(c, DB_CONTAINER_NAME)
 
 
-@task(stop_db_docker, start_db_docker)
+@task(stop_rm_db_docker, start_db_docker)
 def restart_db_docker(c):
     pass
 
 
 @contextmanager
 def db_docker(c):
-    stop_db_docker(c)
+    stop_rm_db_docker(c)
     start_db_docker(c)
     # TODO: implement a better mechanism to check for DB being responsive
     import time
@@ -128,7 +128,7 @@ def db_docker(c):
     try:
         yield
     finally:
-        stop_db_docker(c)
+        stop_rm_db_docker(c)
 
 
 # =======
@@ -137,21 +137,21 @@ def db_docker(c):
 
 
 @task
-def stop_prod_docker(c):
-    stop_docker_container(c, APP_CONTAINER_NAME_PROD)
+def stop_app_prod_docker(c):
+    stop_rm_docker_container(c, APP_CONTAINER_NAME_PROD)
 
 
 @contextmanager
 def app_prod_docker_cleanup(c):
-    stop_prod_docker(c)
+    stop_app_prod_docker(c)
     try:
         yield
     finally:
-        stop_prod_docker(c)
+        stop_app_prod_docker(c)
 
 
 @task(docker_build)
-def start_prod_docker(c):
+def start_app_prod_docker(c):
     """Starts a prod app container. Doesn't create a DB container."""
     with app_prod_docker_cleanup(c):
         c.run(
@@ -169,15 +169,15 @@ def start_prod_docker(c):
 
 
 @task(docker_build)
-def start_prod_docker_with_db_docker(c):
+def start_app_prod_docker_with_db_docker(c):
     """Starts an app container after creating a DB container."""
     with db_docker(c):
-        start_prod_docker(c)
+        start_app_prod_docker(c)
 
 
 @task
 def stop_dev_docker(c):
-    stop_docker_container(c, APP_CONTAINER_NAME_DEV)
+    stop_rm_docker_container(c, APP_CONTAINER_NAME_DEV)
 
 
 @contextmanager
@@ -195,7 +195,8 @@ def start_dev_docker(c):
     with app_dev_docker_cleanup(c):
         c.run(
             "docker run -it"
-            f" --publish {run.HOST}:{run.PORT}:{run.PORT}"
+            " --network host"
+            # f" --publish {run.HOST}:{run.PORT}:{run.PORT}"
             f"{format_docker_env_options(file_name=utils.DOT_ENV_FILE_NAME)}"
             f"{DOCKER_VOLUME_MOUNTS}"
             f" --name {APP_CONTAINER_NAME_DEV}"

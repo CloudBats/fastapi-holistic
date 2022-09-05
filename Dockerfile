@@ -122,7 +122,7 @@ EXPOSE ${PORT}
 # We expect src/, config/ and tests/ to be volume mounts
 FROM app-dev-base AS app-dev
 
-CMD ["invoke", "dev.start-gunicorn"]
+CMD ["invoke", "dev.start"]
 
 
 FROM app-dev-base AS app-ci

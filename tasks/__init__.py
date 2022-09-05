@@ -18,7 +18,7 @@ from . import utils
 
 
 db_collection = Collection(
-    start=containers.start_db_docker, stop=containers.stop_db_docker, restart=containers.restart_db_docker
+    start=containers.start_db_docker, stop=containers.stop_rm_db_docker, restart=containers.restart_db_docker
 )
 ns = Collection(
     bootstrap=Collection(
@@ -61,8 +61,8 @@ ns = Collection(
         docker=Collection(
             db=db_collection,
             build=containers.docker_build,
-            start=containers.start_prod_docker_with_db_docker,
-            stop=containers.stop_prod_docker,
+            start=containers.start_app_prod_docker_with_db_docker,
+            stop=containers.stop_app_prod_docker,
         ),
     ),
     ci=Collection(

@@ -16,7 +16,7 @@ WAIT_SECONDS = 1
     before=before_log(logger, logging.INFO),
     after=after_log(logger, logging.WARN),
 )
-def db_health_check():
+def health_check():
     logger.info("Checking DB...")
     # logger.info(app_config)
 
